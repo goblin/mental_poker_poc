@@ -1,0 +1,26 @@
+This is a simple proof of concept to implement mental poker for two players
+(texas hold'em) using libTMCG. IT WILL WORK!
+
+It requires libTMCG from http://www.nongnu.org/libtmcg/
+
+To compile, type make (or gmake) - make sure libTMCG-config is in your path.
+
+To test run, use:
+
+  $ mkfifo fi fo
+
+then in one terminal run:
+
+  $ ./master > fi < fo
+
+and in another run:
+
+  $ ./slave < fi > fo
+
+If it feels too slow for you, edit both .cc files and change the security
+parameter t from 64 to something lower (e.g. 48) - read libTMCG's docs for
+more info.
+
+But it works! We can easily implement 2-player texas hold'em without a central
+server or trusted authority!
+
