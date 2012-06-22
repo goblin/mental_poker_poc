@@ -17,6 +17,9 @@ and in another run:
 
   $ ./slave < fi > fo
 
+On an AMD Phenom 3.6GHz it takes about 3.5 seconds for the whole run
+(shuffling and trasmitting the deck and revealing all cards).
+
 If it feels too slow for you, edit both .cc files and change the security
 parameter t from 64 to something lower (e.g. 48) - read libTMCG's docs for
 more info.
