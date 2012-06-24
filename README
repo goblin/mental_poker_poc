@@ -1,30 +1,58 @@
-This is a simple proof of concept to implement mental poker for two players
-(texas hold'em) using libTMCG. IT WILL WORK!
+This is a simple proof of concept to implement mental poker (texas hold'em)
+for multiple players using libTMCG. IT WILL WORK!
+
+It's not playable in current state, it's just a proof of concept that
+checks performance.
 
 It requires libTMCG from http://www.nongnu.org/libtmcg/
+It also requires boost::asio to be installed system-wide.
 
 To compile, type make (or gmake) - make sure libTMCG-config is in your path.
 
-To test run, use:
+To test run, decide on how many players you want to simulate, let's say
+it's <num_players>. Open <num_players> terminal windows. Then SLOWLY
+start booting up a client in each terminal window like so:
 
-  $ mkfifo fi fo
+  $ ./client <num_players> <player_id> <base_port>
 
-then in one terminal run:
+Where <player_id> is a number from between 0 and <num_players> - you should
+increment it by 1 in each terminal window. <base_port> is the base TCP port 
+that the clients will listen on. Currently only 127.0.0.1 is supported. 
+Each client will use <base_port> + <player_id> as the port it listens on, 
+and will connect to all other clients' ports. Again, add new clients slowly 
+and in order, and wait for all previous clients to display a "waiting for 
+connection from x" message before starting client x. If you connect them 
+too fast or out of order, it might blow up.
 
-  $ ./master > fi < fo
+As you start the last client, they will begin shuffling the deck and
+communicating encrypted data, and at the end they will all display their
+corresponding cards. The idea is that these cards will be used by a front-end
+and there will be appropriate pausing between each game step to allow players
+to make bets. Cards are represented as an integer between 0 and 51.
 
-and in another run:
+See the file stats.dat for running times. It was done on an AMD Phenom X6
+1090 processor running at 3.6GHz per core. The format of this file is:
 
-  $ ./slave < fi > fo
+  <number_of_players> <total_runtime_in_secs> <total_transferred_data_in_mb>
 
-On an AMD Phenom 3.6GHz it takes about 3.5 seconds for the whole run
-(shuffling and trasmitting the deck and revealing all cards). It transmits
-just below 160kB of data each way.
+Total transferred data is measured by simply running tcpdump for the
+corresponding ports and checking the pcap file size.
 
-If it feels too slow for you, edit both .cc files and change the security
-parameter t from 64 to something lower (e.g. 48) - read libTMCG's docs for
-more info.
+To visualize the data, use:
 
-But it works! We can easily implement 2-player texas hold'em without a central
-server or trusted authority!
+  $ gnuplot -p stats.gnuplot
+
+You can see the running time and total data transferred increases slightly
+polynomially at a first glance.
+
+Remember it's not optimized at all, and there's plenty of room for improvement.
+
+It is also possible to trade off the running time with security. You can 
+change the security parameter t in client.cc:117 from 64 to something lower.
+Read libTMCG's docs for more info.
+
+Conclusion:
+It works! We can easily implement 2-player texas hold'em without a central
+server or trusted authority! More players are also possible, but there's
+always the problem of detecting collusion, and it's a bit slower to shuffle.
 

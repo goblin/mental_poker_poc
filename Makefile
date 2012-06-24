@@ -1,9 +1,7 @@
 TMCG=$(shell libTMCG-config --libs --cflags) -Wl,-rpath $(shell libTMCG-config --prefix)/lib
 
-all: master slave
+all: client 
 
-master: master.cc Makefile
-	g++ -o master $(TMCG) master.cc
+client: client.cc Makefile
+	g++ -o client $(TMCG) -pthread -lboost_system client.cc
 
-slave: slave.cc Makefile
-	g++ -o slave $(TMCG) slave.cc
